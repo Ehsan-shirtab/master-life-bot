@@ -1,0 +1,110 @@
+# ============================================
+# render.yaml — Master Life Bot
+# Deploy this entire file to Render
+# ============================================
+
+services:
+  # ── Main Web Service (handles webhook from Telegram) ──────────────────
+  - type: web
+    name: master-life-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: BOT_SECRET
+        sync: false
+
+  # ── Cron Jobs ──────────────────────────────────────────────────────────
+  # All times are UTC. Vancouver (PDT) = UTC-7, (PST) = UTC-8
+  # Adjust UTC times based on season (summer = UTC-7, winter = UTC-8)
+  # Times below use PDT (summer) as base — adjust ±1hr in winter
+
+  # 🔬 Tech Breakthrough — Daily 7:00 AM Vancouver = 14:00 UTC
+  - type: cron
+    name: tech-news-daily
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=tech_news&secret=$BOT_SECRET"
+    schedule: "0 14 * * *"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # 📈 Trend Radar — Every Monday 8:00 AM Vancouver = 15:00 UTC Monday
+  - type: cron
+    name: trend-radar-weekly
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=trend_radar&secret=$BOT_SECRET"
+    schedule: "0 15 * * 1"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # 💡 Skill of the Week — Mon/Wed/Fri 9:00 AM Vancouver = 16:00 UTC
+  - type: cron
+    name: skill-mwf
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=skill&secret=$BOT_SECRET"
+    schedule: "0 16 * * 1,3,5"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # 🇨🇦 English Immersion — Daily 12:00 PM Vancouver = 19:00 UTC
+  - type: cron
+    name: english-daily
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=language&secret=$BOT_SECRET"
+    schedule: "0 19 * * *"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # 📚 Bedtime Book Summary — Daily 9:00 PM Vancouver = 04:00 UTC next day
+  - type: cron
+    name: book-summary-nightly
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=book_summary&secret=$BOT_SECRET"
+    schedule: "0 4 * * *"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # 🧠 Second Brain Auto-Capture — Daily 9:30 PM Vancouver = 04:30 UTC next day
+  - type: cron
+    name: second-brain-nightly
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=second_brain&secret=$BOT_SECRET"
+    schedule: "30 4 * * *"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
+
+  # ☀️ Sunday Life Dashboard — Every Sunday 8:00 AM Vancouver = 15:00 UTC Sunday
+  - type: cron
+    name: analytics-sunday
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: >
+      curl -s "https://master-life-bot.onrender.com/run?module=analytics&secret=$BOT_SECRET"
+    schedule: "0 15 * * 0"
+    envVars:
+      - key: BOT_SECRET
+        sync: false
