@@ -7,7 +7,7 @@ https://aistudio.google.com/app/apikey
 (Sign in with Google → Create API Key → Copy it)
 
 Free tier limits (very generous):
-- Gemini 1.5 Flash: 15 requests/min, 1,500 requests/day, 1M tokens/min
+- Gemini 2.5 Flash: 15 requests/min, 1,500 requests/day, 1M tokens/min
 - More than enough for all 7 bot modules combined
 """
 
@@ -16,10 +16,10 @@ import requests
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Using Gemini 1.5 Flash — fastest, free, and excellent quality
+# Using Gemini 2.5 Flash — fastest, free, and excellent quality
 GEMINI_URL = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-1.5-flash:generateContent"
+    "gemini-2.5-flash:generateContent"
 )
 
 
@@ -27,7 +27,7 @@ def ask_claude(prompt: str, system: str = None, max_tokens: int = 1000) -> str:
     """
     Drop-in replacement for the old Claude API call.
     Same function name so no other files need to change.
-    Uses Google Gemini 1.5 Flash (free tier).
+    Uses Google Gemini 2.5 Flash (free tier).
     """
     if not GEMINI_API_KEY:
         return "⚠️ GEMINI_API_KEY not set. Get your free key at https://aistudio.google.com/app/apikey"
