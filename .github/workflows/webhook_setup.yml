@@ -1,0 +1,12 @@
+name: Set Telegram Webhook
+
+on:
+  workflow_dispatch: # Lets you trigger it manually
+
+jobs:
+  set-webhook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send the request to Telegram
+        run: |
+          curl "https://api.telegram.org/bot8687177794:AAGGGiOv5PlUcXU5myjMFCICVe_n7BKS5qU/setWebhook?url=https://master-life-bot.onrender.com/webhook"
