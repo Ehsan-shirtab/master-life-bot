@@ -1,7 +1,6 @@
-from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime, date
-
+from google import genai
 
 BOOK_LIST = [
     ("Atomic Habits", "James Clear", "habits & self-improvement"),
@@ -36,11 +35,9 @@ DAY_THEMES = [
     "the overall summary, key takeaways, and whether to read the full book",
 ]
 
-
 def get_this_weeks_book():
     week_num = date.today().isocalendar()[1]
     return BOOK_LIST[week_num % len(BOOK_LIST)]
-
 
 def send_book_summary():
     today = datetime.now()
@@ -78,11 +75,23 @@ One sentence previewing tomorrow's focus: {tomorrow_theme}
 
 Total response must be under 300 words. Plain text only, no special characters."""
 
-    content = ask_claude(prompt, system=system, max_tokens=2048)
+    # --- NEW GEMINI 2.5 ENGINE ---
+    client = genai.Client()
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config={'system_instruction': system}
+        )
+        content = response.text
+    except Exception as e:
+        print(f"Gemini Error: {e}")
+        content = f"⚠️ System Error: Could not generate summary. ({e})"
+    # -----------------------------
 
     message = (
-        f"Bedtime Reading - {date_str}\n\n"
-        f"Book: {book_title} by {book_author}\n"
+        f"🌙 Bedtime Reading — {date_str}\n\n"
+        f"📚 {book_title}\nby {book_author}\n"
         f"Day {day_of_week + 1} of 7\n\n"
         f"{'─' * 25}\n\n"
         f"{content}\n\n"
