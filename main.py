@@ -23,13 +23,15 @@ app = Flask(__name__)
 SECRET = os.getenv("BOT_SECRET", "changeme")
 
 MODULES = {
-    "tech_news":    send_tech_news,
-    "skill":        send_skill,
-    "trend_radar":  send_trend_radar,
-    "book_summary": send_book_summary,
-    "language":     send_language_lesson,
-    "analytics":    send_analytics,
+    "tech_news":     send_tech_news,
+    "skill":         send_skill,
+    "second_brain":  send_second_brain,
+    "trend_radar":   send_trend_radar,
+    "book_summary":  send_book_summary,
+    "language":      send_language_lesson,
+    "analytics":     send_analytics,
 }
+
 
 
 @app.route("/")
