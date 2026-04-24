@@ -1,16 +1,3 @@
-"""
-modules/book_summary.py
-Module 5: Bedtime Book Summary
-Sent every night at 9:00 PM Vancouver time.
-
-What it does:
-- Each week covers ONE book (same book Mon-Sun, different chapter/concept daily)
-- Books rotate weekly across categories: psychology, productivity, finance,
-  philosophy, science, leadership, habits, communication
-- Perfect for reading before bed: calm, educational, 2-minute read
-- By end of week you've absorbed the whole book's key ideas
-"""
-
 from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime, date
@@ -32,7 +19,7 @@ BOOK_LIST = [
     ("The Subtle Art of Not Giving a F*ck", "Mark Manson", "values & priorities"),
     ("Essentialism", "Greg McKeown", "focus & eliminating the non-essential"),
     ("The 4-Hour Workweek", "Tim Ferriss", "lifestyle design & efficiency"),
-    ("Daring Greatly", "Brené Brown", "vulnerability & courage"),
+    ("Daring Greatly", "Brene Brown", "vulnerability & courage"),
     ("Start With Why", "Simon Sinek", "purpose & leadership"),
     ("The Alchemist", "Paulo Coelho", "purpose & following your path"),
     ("Flow", "Mihaly Csikszentmihalyi", "optimal experience & engagement"),
@@ -58,49 +45,49 @@ def get_this_weeks_book():
 def send_book_summary():
     today = datetime.now()
     date_str = today.strftime("%B %d, %Y")
-    day_of_week = today.weekday()  # 0=Mon ... 6=Sun
+    day_of_week = today.weekday()
+    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    day_name = day_names[day_of_week]
 
     book_title, book_author, book_category = get_this_weeks_book()
     day_theme = DAY_THEMES[day_of_week]
-
-    # Day label
-    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    day_name = day_names[day_of_week]
+    tomorrow_theme = DAY_THEMES[(day_of_week + 1) % 7]
 
     system = """You are a bedtime reading companion. Your summaries are calm, 
 thoughtful, and easy to absorb before sleep. You help people learn the key 
 ideas of great books without needing to read every page. Write in a warm, 
-conversational tone. Never overwhelming — always calming and insightful."""
+conversational tone. Never overwhelming, always calming and insightful.
+Never use asterisks, underscores, or any markdown symbols in your response."""
 
-    prompt = f"""Tonight's book is: "{book_title}" by {book_author}
+    prompt = f"""Tonight's book is: {book_title} by {book_author}
 Category: {book_category}
-Today ({day_name}) focus: {day_theme}
+Today is {day_name}. Tonight's focus: {day_theme}
 
-Write a bedtime summary in this EXACT format:
+Write exactly three sections:
 
-🌙 *Bedtime Reading — {date_str}*
+TONIGHTS FOCUS:
+Write 3 to 4 calm paragraphs about {day_theme} from this book.
+Be specific, reference actual content from the book.
+No bullet points, flowing prose only.
 
-📚 *{book_title}*
-_by {book_author} · Day {day_of_week + 1} of 7_
+SLEEP ON THIS:
+One gentle question or reflection to think about before sleeping.
 
-━━━━━━━━━━━━━━━
+TOMORROW:
+One sentence previewing tomorrow's focus: {tomorrow_theme}
 
-✨ *TONIGHT'S FOCUS*
-_{day_theme.capitalize()}_
+Total response must be under 300 words. Plain text only, no special characters."""
 
-[Write 3-4 calm, well-crafted paragraphs covering tonight's theme from this book. 
-Be specific — reference actual content from the book. 
-Write as if you're a wise friend sharing something interesting before bed.
-No bullet points — flowing prose only tonight.]
+    content = ask_claude(prompt, system=system, max_tokens=2048)
 
-━━━━━━━━━━━━━━━
+    message = (
+        f"Bedtime Reading - {date_str}\n\n"
+        f"Book: {book_title} by {book_author}\n"
+        f"Day {day_of_week + 1} of 7\n\n"
+        f"{'─' * 25}\n\n"
+        f"{content}\n\n"
+        f"{'─' * 25}\n"
+        f"Sleep well."
+    )
 
-💭 *SLEEP ON THIS*
-[One gentle question or thought to reflect on as you fall asleep]
-
-😴 _Sleep well. Tomorrow: {DAY_THEMES[(day_of_week + 1) % 7]}_
-
-Keep it under 280 words. Calm and thoughtful."""
-
-    content = ask_claude(prompt, system=system, max_tokens=700)
-    send_message(content)
+    send_message(message)
