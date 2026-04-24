@@ -1,6 +1,5 @@
 from utils.telegram import send_message
 from datetime import datetime, date
-from google import genai
 
 BOOK_LIST = [
     ("Atomic Habits", "James Clear", "habits & self-improvement"),
