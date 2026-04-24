@@ -27,13 +27,13 @@ BOOK_LIST = [
 ]
 
 DAY_THEMES = [
-    "the core problem this book solves and the author's main argument",
-    "the most surprising or counterintuitive idea in this book",
-    "the most practical, actionable advice from this book",
-    "a story or case study from this book that illustrates the key concept",
-    "how the ideas in this book apply to modern daily life",
-    "the most memorable quote and its deeper meaning",
-    "the overall summary, key takeaways, and whether to read the full book",
+    "the opening of the story, the world the author builds, and the central question the book asks",
+    "the most surprising and counterintuitive idea in this book that challenges common thinking",
+    "the deepest practical wisdom in this book and how it changes the way you live day to day",
+    "the most powerful story or scene in the book and why it stays with you long after reading",
+    "how the core ideas of this book connect to real modern life, relationships, and daily decisions",
+    "the most memorable and meaningful quotes from the book and the deep truth behind each one",
+    "the complete journey of the book, its lasting message, and why every person should experience it",
 ]
 
 
@@ -53,41 +53,58 @@ def send_book_summary():
     day_theme = DAY_THEMES[day_of_week]
     tomorrow_theme = DAY_THEMES[(day_of_week + 1) % 7]
 
-    system = """You are a bedtime reading companion. Your summaries are calm,
-thoughtful, and easy to absorb before sleep. You help people learn the key
-ideas of great books without needing to read every page. Write in a warm,
-conversational tone. Never overwhelming, always calming and insightful.
-Never use asterisks, underscores, or any markdown symbols in your response."""
+    system = """You are a master storyteller and literary companion who brings books 
+to life at bedtime. You write in a warm, deep, immersive voice — like a wise and 
+brilliant friend who has read thousands of books and loves sharing them.
 
-    prompt = f"""Tonight's book is: {book_title} by {book_author}
+Your writing style:
+- Rich, flowing, unhurried prose that feels like being told a story
+- You paint pictures with words — the reader feels transported
+- You weave between the book's world and real human emotions seamlessly  
+- You treat the reader as intelligent and curious
+- Your tone is intimate, like a late night conversation by a fireplace
+- You never summarize like a book report — you illuminate like a poet
+- You make the reader FEEL the book, not just understand it
+- No bullet points ever. No markdown symbols. Pure flowing prose only.
+- Write at least 800 words — this should take 8 to 10 minutes to read slowly"""
+
+    prompt = f"""Tonight you are sharing: {book_title} by {book_author}
 Category: {book_category}
-Today is {day_name}. Tonight's focus: {day_theme}
+Tonight is Day {day_of_week + 1} of 7. Tonight's deep focus: {day_theme}
 
-Write exactly three sections:
+Write a rich, immersive, beautifully crafted bedtime reading experience.
 
-TONIGHTS FOCUS:
-Write 3 to 4 calm paragraphs about {day_theme} from this book.
-Be specific, reference actual content from the book.
-No bullet points, flowing prose only.
+Begin with a warm, poetic opening paragraph that sets the mood and draws the reader 
+into the world of this book. Make them feel they are settling in for something special.
 
-SLEEP ON THIS:
-One gentle question or reflection to think about before sleeping.
+Then spend the heart of the piece going deeply into: {day_theme}
+This is not a summary. This is an experience. Write as if you are slowly walking 
+the reader through the most meaningful rooms of this book, pausing in each one, 
+letting them feel the weight and beauty of the ideas. Use scenes from the book. 
+Use the author's own ideas but expressed in your warm storytelling voice. 
+Connect the book's world to the reader's inner life — their hopes, fears, 
+relationships, choices, and dreams.
 
-TOMORROW:
-One sentence previewing tomorrow's focus: {tomorrow_theme}
+Then write a closing section called "Before You Sleep" — a gentle, reflective 
+passage that leaves the reader with one profound thought to carry into their dreams. 
+Not a question. A thought. Something that lingers like the last note of a song.
 
-Total response must be under 300 words. Plain text only, no special characters."""
+End with one sentence: "Tomorrow night we explore: {tomorrow_theme}"
+
+Write at least 800 words. This is bedtime literature, not a summary.
+Plain text only. No asterisks, no underscores, no special characters."""
 
     content = ask_claude(prompt, system=system, max_tokens=2048)
 
     message = (
         f"Bedtime Reading - {date_str}\n\n"
-        f"Book: {book_title} by {book_author}\n"
-        f"Day {day_of_week + 1} of 7\n\n"
-        f"{'─' * 25}\n\n"
+        f"Book: {book_title}\n"
+        f"Author: {book_author}\n"
+        f"Night {day_of_week + 1} of 7\n\n"
+        f"{'─' * 30}\n\n"
         f"{content}\n\n"
-        f"{'─' * 25}\n"
-        f"Sleep well."
+        f"{'─' * 30}\n"
+        f"Sleep well. The book continues tomorrow."
     )
 
     send_message(message)
