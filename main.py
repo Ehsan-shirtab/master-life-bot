@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from modules.tech_news import send_tech_news
 from modules.skill_of_week import send_skill
-from modules.second_brain import handle_second_brain
+from modules.second_brain import handle_second_brain, send_second_brain
 from modules.trend_radar import send_trend_radar
 from modules.book_summary import send_book_summary
 from modules.language import send_language_lesson
