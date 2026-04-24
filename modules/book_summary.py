@@ -1,5 +1,7 @@
+from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime, date
+
 
 BOOK_LIST = [
     ("Atomic Habits", "James Clear", "habits & self-improvement"),
@@ -34,9 +36,11 @@ DAY_THEMES = [
     "the overall summary, key takeaways, and whether to read the full book",
 ]
 
+
 def get_this_weeks_book():
     week_num = date.today().isocalendar()[1]
     return BOOK_LIST[week_num % len(BOOK_LIST)]
+
 
 def send_book_summary():
     today = datetime.now()
@@ -49,9 +53,9 @@ def send_book_summary():
     day_theme = DAY_THEMES[day_of_week]
     tomorrow_theme = DAY_THEMES[(day_of_week + 1) % 7]
 
-    system = """You are a bedtime reading companion. Your summaries are calm, 
-thoughtful, and easy to absorb before sleep. You help people learn the key 
-ideas of great books without needing to read every page. Write in a warm, 
+    system = """You are a bedtime reading companion. Your summaries are calm,
+thoughtful, and easy to absorb before sleep. You help people learn the key
+ideas of great books without needing to read every page. Write in a warm,
 conversational tone. Never overwhelming, always calming and insightful.
 Never use asterisks, underscores, or any markdown symbols in your response."""
 
@@ -74,23 +78,11 @@ One sentence previewing tomorrow's focus: {tomorrow_theme}
 
 Total response must be under 300 words. Plain text only, no special characters."""
 
-    # --- NEW GEMINI 2.5 ENGINE ---
-    client = genai.Client()
-    try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-            config={'system_instruction': system}
-        )
-        content = response.text
-    except Exception as e:
-        print(f"Gemini Error: {e}")
-        content = f"⚠️ System Error: Could not generate summary. ({e})"
-    # -----------------------------
+    content = ask_claude(prompt, system=system, max_tokens=2048)
 
     message = (
-        f"🌙 Bedtime Reading — {date_str}\n\n"
-        f"📚 {book_title}\nby {book_author}\n"
+        f"Bedtime Reading - {date_str}\n\n"
+        f"Book: {book_title} by {book_author}\n"
         f"Day {day_of_week + 1} of 7\n\n"
         f"{'─' * 25}\n\n"
         f"{content}\n\n"
