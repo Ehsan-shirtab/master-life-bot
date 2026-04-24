@@ -166,3 +166,52 @@ Keep it under 220 words. Make it genuinely interesting."""
 
     content = ask_claude(prompt, system=system, max_tokens=600)
     send_message(content)
+def send_second_brain():
+    """
+    Called by cron at 9:30 PM daily.
+    Bot auto-finds one valuable idea and sends it proactively.
+    """
+    from datetime import date
+    today = datetime.now().strftime("%B %d, %Y")
+
+    day = date.today().weekday()
+    topics = [
+        "psychology and human behavior",
+        "future of work and technology",
+        "health and longevity science",
+        "economics and how money works",
+        "philosophy and decision making",
+        "nature and environmental science",
+        "history lessons relevant to today",
+    ]
+    topic = topics[day]
+
+    system = """You are a Second Brain curator. Every day you find one 
+fascinating, practical idea worth knowing. You focus on ideas that are 
+surprising, counterintuitive, or immediately useful.
+Never use asterisks, underscores, or markdown symbols."""
+
+    prompt = f"""Today is {today}. Find ONE fascinating concept or idea from: {topic}
+
+Write in this format:
+
+SECOND BRAIN CAPTURE - {today}
+
+IDEA NAME: [Give it a compelling name]
+
+WHAT IS IT:
+[2 to 3 sentences explaining the idea clearly]
+
+THE SURPRISING PART:
+[The counterintuitive or fascinating aspect most people do not know]
+
+HOW TO USE THIS:
+[One practical way to apply this idea in real life]
+
+LEARN MORE:
+[One book, website, or search term to explore further]
+
+Plain text only. No special characters."""
+
+    content = ask_claude(prompt, system=system, max_tokens=2048)
+    send_message(content)
