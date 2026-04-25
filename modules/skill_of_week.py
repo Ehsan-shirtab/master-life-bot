@@ -1,116 +1,112 @@
-"""
-modules/skill_of_week.py
-Module 2: Skill of the Week — sent Mon / Wed / Fri at 9:00 AM
-
-What it does:
-- Monday:    Introduces the week's micro-skill with full explanation
-- Wednesday: Gives a practical exercise to apply it
-- Friday:    Gives a real-world example + recap + next steps
-
-Skills rotate across categories:
-communication, productivity, tech, finance, negotiation, 
-critical thinking, writing, speed reading, memory techniques
-"""
-
-import os
 from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime, date
-import hashlib
 
 
 SKILL_CATEGORIES = [
-    "communication & persuasion",
-    "productivity & time management",
-    "Excel & spreadsheet shortcuts",
-    "Python & coding basics",
+    "communication and persuasion",
+    "productivity and time management",
+    "Excel and spreadsheet shortcuts",
+    "Python and coding basics",
     "financial literacy",
-    "negotiation & influence",
-    "critical thinking & logic",
+    "negotiation and influence",
+    "critical thinking and logic",
     "clear professional writing",
-    "speed reading & comprehension",
-    "memory techniques & mnemonics",
-    "public speaking & confidence",
+    "speed reading and comprehension",
+    "memory techniques and mnemonics",
+    "public speaking and confidence",
     "problem solving frameworks",
 ]
 
 
 def get_week_skill():
-    """Deterministically pick this week's skill category based on week number."""
     week_num = date.today().isocalendar()[1]
     return SKILL_CATEGORIES[week_num % len(SKILL_CATEGORIES)]
 
 
 def send_skill():
     today = datetime.now()
-    weekday = today.weekday()  # 0=Mon, 2=Wed, 4=Fri
+    weekday = today.weekday()
     skill = get_week_skill()
     date_str = today.strftime("%B %d, %Y")
 
-    if weekday == 0:  # Monday
-        day_label = "📖 *INTRODUCTION*"
-        instruction = f"""It's Monday — introduce this week's micro-skill on {skill}.
+    if weekday == 0:
+        instruction = f"""It is Monday. Introduce this week's micro-skill: {skill}.
+Date: {date_str}
 
-Format EXACTLY:
-🎯 *SKILL OF THE WEEK*
-[Skill name — make it specific, not just the category]
+Write in this format:
 
-📖 *WHAT IS IT?*
-[2-3 sentences explaining the skill clearly]
+SKILL OF THE WEEK - {date_str}
 
-🤔 *WHY LEARN THIS?*
-[1-2 sentences: real benefit in daily life or career]
+SKILL: [Specific skill name]
 
-⚡ *CORE CONCEPT*
-[The single most important idea to understand about this skill]
+WHAT IS IT:
+Two to three sentences explaining the skill clearly.
 
-📅 *THIS WEEK'S PLAN*
-Mon: Learn the concept (today!)
-Wed: Practice exercise
-Fri: Real-world example + recap"""
+WHY LEARN THIS:
+One to two sentences on the real benefit in daily life or career.
 
-    elif weekday == 2:  # Wednesday
-        day_label = "💪 *PRACTICE DAY*"
-        instruction = f"""It's Wednesday — give a hands-on practice exercise for this week's skill: {skill}.
+CORE CONCEPT:
+The single most important idea to understand about this skill.
 
-Format EXACTLY:
-💪 *PRACTICE EXERCISE — {skill.upper()}*
+THIS WEEK'S PLAN:
+Monday: Learn the concept (today)
+Wednesday: Practice exercise
+Friday: Real world example and recap
 
-🎯 *TODAY'S CHALLENGE*
-[One specific, doable 10-minute exercise to practice this skill]
+Plain text only. No special characters."""
 
-📝 *STEP BY STEP*
-1. [Step 1]
-2. [Step 2]  
-3. [Step 3]
+    elif weekday == 2:
+        instruction = f"""It is Wednesday. Give a hands-on practice exercise for: {skill}.
+Date: {date_str}
 
-✅ *SUCCESS LOOKS LIKE*
-[How they know they did it right]
+Write in this format:
 
-⏱️ *Time needed: 10-15 minutes*"""
+SKILL PRACTICE - {date_str}
+This week: {skill}
 
-    else:  # Friday
-        day_label = "🏆 *REAL WORLD EXAMPLE*"
-        instruction = f"""It's Friday — give a real-world example and weekly recap for this week's skill: {skill}.
+TODAY'S CHALLENGE:
+One specific doable 10 minute exercise to practice this skill.
 
-Format EXACTLY:
-🏆 *REAL-WORLD EXAMPLE — {skill.upper()}*
+STEP BY STEP:
+Step 1: [what to do]
+Step 2: [what to do]
+Step 3: [what to do]
 
-🌍 *HOW A PRO USES THIS*
-[A specific, realistic example of someone using this skill effectively]
+SUCCESS LOOKS LIKE:
+How you know you did it right.
 
-💬 *BEFORE vs AFTER*
-Before: [Without this skill]
-After: [With this skill]
+Time needed: 10 to 15 minutes.
 
-🔑 *KEY TAKEAWAY*
-[The one thing to remember from this whole week]
+Plain text only. No special characters."""
 
-📚 *GO DEEPER*
-[One book, YouTube channel, or resource to master this skill]"""
+    else:
+        instruction = f"""It is Friday. Give a real world example and recap for: {skill}.
+Date: {date_str}
 
-    system = "You are a concise, practical skills coach. Be specific, actionable, and encouraging. No fluff."
-    content = ask_claude(instruction, system=system, max_tokens=500)
+Write in this format:
 
-    message = f"💡 *Skill of the Week — {date_str}*\n\n{content}"
-    send_message(message)
+SKILL RECAP - {date_str}
+This week: {skill}
+
+HOW A PRO USES THIS:
+A specific realistic example of someone using this skill effectively.
+
+BEFORE AND AFTER:
+Before learning this skill: [description]
+After learning this skill: [description]
+
+KEY TAKEAWAY:
+The one thing to remember from this whole week.
+
+GO DEEPER:
+One book, YouTube channel, or free resource to master this skill.
+
+Plain text only. No special characters."""
+
+    system = """You are a concise practical skills coach.
+Be specific, actionable, and encouraging. No fluff.
+Never use asterisks, underscores, or markdown symbols. Plain text only."""
+
+    content = ask_claude(instruction, system=system, max_tokens=1000)
+    send_message(content)
