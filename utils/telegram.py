@@ -11,12 +11,29 @@ def send_message(text: str, chat_id: str = None):
         print("TELEGRAM_TOKEN or CHAT_ID not set")
         return
 
-    # Remove markdown symbols that break Telegram
-    clean = text.replace("*", "").replace("_", "").replace("`", "")
+    # Clean any markdown symbols
+    clean = text.replace("*", "").replace("`", "")
 
-    chunks = [clean[i:i+3000] for i in range(0, len(clean), 3000)]
+    # Split into chunks of 3800 characters at paragraph boundaries
+    chunks = []
+    while len(clean) > 3800:
+        # Find the last paragraph break before 3800 chars
+        split_at = clean.rfind("\n\n", 0, 3800)
+        if split_at == -1:
+            # No paragraph break found, split at last newline
+            split_at = clean.rfind("\n", 0, 3800)
+        if split_at == -1:
+            # No newline found, hard split
+            split_at = 3800
+        chunks.append(clean[:split_at].strip())
+        clean = clean[split_at:].strip()
 
-    for chunk in chunks:
+    chunks.append(clean)
+
+    # Send each chunk
+    for i, chunk in enumerate(chunks):
+        if not chunk:
+            continue
         url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
         payload = {
             "chat_id": target,
@@ -27,7 +44,7 @@ def send_message(text: str, chat_id: str = None):
             r = requests.post(url, json=payload, timeout=10)
             r.raise_for_status()
         except Exception as e:
-            print(f"Telegram send error: {e}")
+            print(f"Telegram send error on chunk {i+1}: {e}")
 
 
 def send_long_message(text: str, chat_id: str = None):
