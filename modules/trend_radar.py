@@ -1,14 +1,3 @@
-"""
-modules/trend_radar.py
-Module 4: Trend Radar
-Sent every Monday at 8:00 AM Vancouver time.
-
-What it does:
-- Identifies 3 trends growing RIGHT NOW across tech, society, business, culture
-- Explains each trend + why it matters + what opportunity it might create
-- Helps you spot things 6-12 months before they go mainstream
-"""
-
 from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime
@@ -18,58 +7,44 @@ def send_trend_radar():
     today = datetime.now().strftime("%B %d, %Y")
     week = datetime.now().isocalendar()[1]
 
-    system = """You are a trend intelligence analyst. Your job is to identify 
-emerging trends that are just starting to gain momentum — not things that are 
-already mainstream. You look across: technology, culture, business, health, 
-work, and society. You focus on trends that a regular person in Canada could 
-actually act on or benefit from knowing."""
+    system = """You are a trend intelligence analyst identifying emerging trends
+gaining momentum right now across technology, culture, business, health, and society.
+Focus on trends relevant to someone living in Canada.
+Never use asterisks, underscores, or markdown symbols. Plain text only."""
 
-    prompt = f"""Today is {today} (Week {week} of the year).
+    prompt = f"""Today is {today}, Week {week} of the year.
+Identify exactly 3 trends gaining momentum right now that are not yet fully mainstream.
 
-Identify exactly 3 trends that are gaining significant momentum RIGHT NOW. 
-These should be things that are growing fast but not yet fully mainstream.
+Write in this format:
 
-Format EXACTLY:
+TREND RADAR - Week {week}
+{today}
 
-📡 *TREND RADAR — Week {week}*
-_{today}_
+TREND 1: [Name]
+Category: Tech or Health or Work or Culture or Business
+Signal: Early or Growing or Accelerating
+What is happening: Two sentences.
+Why it matters: One to two sentences on real world impact.
+Your opportunity: One sentence on how you could benefit or prepare.
 
-━━━━━━━━━━━━━━━━━
+TREND 2: [Name]
+Category: [...]
+Signal: [...]
+What is happening: Two sentences.
+Why it matters: One to two sentences.
+Your opportunity: One sentence.
 
-📈 *TREND 1: [Name]*
-🏷️ Category: [Tech / Health / Work / Culture / Business]
-📊 Signal strength: [Early 🟡 / Growing 🟠 / Accelerating 🔴]
+TREND 3: [Name]
+Category: [...]
+Signal: [...]
+What is happening: Two sentences.
+Why it matters: One to two sentences.
+Your opportunity: One sentence.
 
-What's happening: [2 sentences]
-Why it matters: [1-2 sentences on real-world impact]
-Your opportunity: [1 sentence — how you could benefit or prepare]
+WILD CARD TO WATCH:
+One unusual thing on the fringe that could become big in the next year.
 
-━━━━━━━━━━━━━━━━━
+Plain text only. No special characters. Total under 400 words."""
 
-📈 *TREND 2: [Name]*
-🏷️ Category: [...]
-📊 Signal strength: [...]
-
-What's happening: [2 sentences]
-Why it matters: [1-2 sentences]
-Your opportunity: [1 sentence]
-
-━━━━━━━━━━━━━━━━━
-
-📈 *TREND 3: [Name]*
-🏷️ Category: [...]
-📊 Signal strength: [...]
-
-What's happening: [2 sentences]
-Why it matters: [1-2 sentences]
-Your opportunity: [1 sentence]
-
-━━━━━━━━━━━━━━━━━
-
-🔭 *WILD CARD TO WATCH*
-[One unusual thing on the fringe that could become big — 2 sentences]
-
-Keep each trend section tight. Total under 350 words."""
-
-    content = ask_claude(prompt, system=system, max_tokens=800)
+    content = ask_claude(prompt, system=system, max_tokens=1000)
     send_message(content)
