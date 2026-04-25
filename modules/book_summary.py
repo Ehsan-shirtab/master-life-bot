@@ -4,107 +4,116 @@ from datetime import datetime, date
 
 
 BOOK_LIST = [
-    ("Atomic Habits", "James Clear", "habits & self-improvement"),
-    ("Thinking, Fast and Slow", "Daniel Kahneman", "psychology & decision making"),
-    ("The Psychology of Money", "Morgan Housel", "personal finance & mindset"),
-    ("Deep Work", "Cal Newport", "productivity & focus"),
-    ("Sapiens", "Yuval Noah Harari", "history & human civilization"),
-    ("Man's Search for Meaning", "Viktor Frankl", "philosophy & resilience"),
-    ("The 7 Habits of Highly Effective People", "Stephen Covey", "leadership & personal development"),
-    ("Meditations", "Marcus Aurelius", "stoic philosophy"),
-    ("The Lean Startup", "Eric Ries", "entrepreneurship & innovation"),
-    ("How to Win Friends and Influence People", "Dale Carnegie", "communication & relationships"),
-    ("The Power of Now", "Eckhart Tolle", "mindfulness & presence"),
-    ("Outliers", "Malcolm Gladwell", "success & what drives it"),
-    ("The Subtle Art of Not Giving a F*ck", "Mark Manson", "values & priorities"),
-    ("Essentialism", "Greg McKeown", "focus & eliminating the non-essential"),
-    ("The 4-Hour Workweek", "Tim Ferriss", "lifestyle design & efficiency"),
-    ("Daring Greatly", "Brene Brown", "vulnerability & courage"),
-    ("Start With Why", "Simon Sinek", "purpose & leadership"),
-    ("The Alchemist", "Paulo Coelho", "purpose & following your path"),
-    ("Flow", "Mihaly Csikszentmihalyi", "optimal experience & engagement"),
-    ("Quiet", "Susan Cain", "introversion & harnessing your strengths"),
+    # Novels & Stories
+    ("The Alchemist", "Paulo Coelho", "novel"),
+    ("The Old Man and the Sea", "Ernest Hemingway", "novel"),
+    ("Animal Farm", "George Orwell", "novel"),
+    ("The Great Gatsby", "F. Scott Fitzgerald", "novel"),
+    ("Of Mice and Men", "John Steinbeck", "novel"),
+    ("The Little Prince", "Antoine de Saint-Exupery", "novel"),
+    ("Siddhartha", "Hermann Hesse", "novel"),
+    ("The Stranger", "Albert Camus", "novel"),
+    ("Brave New World", "Aldous Huxley", "novel"),
+    ("1984", "George Orwell", "novel"),
+    # Biographies & True Stories
+    ("The Diary of a Young Girl", "Anne Frank", "biography"),
+    ("Long Walk to Freedom", "Nelson Mandela", "biography"),
+    ("Leonardo da Vinci", "Walter Isaacson", "biography"),
+    ("Elon Musk", "Walter Isaacson", "biography"),
+    ("Steve Jobs", "Walter Isaacson", "biography"),
+    ("Educated", "Tara Westover", "memoir"),
+    ("The Glass Castle", "Jeannette Walls", "memoir"),
+    ("Born a Crime", "Trevor Noah", "memoir"),
+    # Philosophy & Wisdom
+    ("Meditations", "Marcus Aurelius", "philosophy"),
+    ("The Art of War", "Sun Tzu", "philosophy"),
+    ("Man's Search for Meaning", "Viktor Frankl", "philosophy"),
+    ("The Republic", "Plato", "philosophy"),
+    ("Thus Spoke Zarathustra", "Friedrich Nietzsche", "philosophy"),
+    # Science & Discovery
+    ("A Brief History of Time", "Stephen Hawking", "science"),
+    ("Sapiens", "Yuval Noah Harari", "science"),
+    ("The Selfish Gene", "Richard Dawkins", "science"),
+    ("Cosmos", "Carl Sagan", "science"),
+    ("The Origin of Species", "Charles Darwin", "science"),
+    # Self Development
+    ("Atomic Habits", "James Clear", "self-development"),
+    ("Thinking Fast and Slow", "Daniel Kahneman", "self-development"),
+    ("The Psychology of Money", "Morgan Housel", "self-development"),
+    ("Deep Work", "Cal Newport", "self-development"),
+    ("Man's Search for Meaning", "Viktor Frankl", "self-development"),
 ]
 
-DAY_THEMES = [
-    "the opening of the story, the world the author builds, and the central question the book asks",
-    "the most surprising and counterintuitive idea in this book that challenges common thinking",
-    "the deepest practical wisdom in this book and how it changes the way you live day to day",
-    "the most powerful story or scene in the book and why it stays with you long after reading",
-    "how the core ideas of this book connect to real modern life, relationships, and daily decisions",
-    "the most memorable and meaningful quotes from the book and the deep truth behind each one",
-    "the complete journey of the book, its lasting message, and why every person should experience it",
-]
 
-
-def get_this_weeks_book():
-    week_num = date.today().isocalendar()[1]
-    return BOOK_LIST[week_num % len(BOOK_LIST)]
+def get_tonights_book():
+    day_num = date.today().toordinal()
+    return BOOK_LIST[day_num % len(BOOK_LIST)]
 
 
 def send_book_summary():
     today = datetime.now()
     date_str = today.strftime("%B %d, %Y")
-    day_of_week = today.weekday()
-    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    day_name = day_names[day_of_week]
 
-    book_title, book_author, book_category = get_this_weeks_book()
-    day_theme = DAY_THEMES[day_of_week]
-    tomorrow_theme = DAY_THEMES[(day_of_week + 1) % 7]
+    book_title, book_author, book_category = get_tonights_book()
 
-    system = """You are a master storyteller and literary companion who brings books 
-to life at bedtime. You write in a warm, deep, immersive voice — like a wise and 
-brilliant friend who has read thousands of books and loves sharing them.
+    system = """You are a master storyteller who brings books completely to life.
+Your job is to give someone the FULL experience of reading an entire book in one 
+sitting — every important scene, idea, character, and lesson.
 
 Your writing style:
-- Rich, flowing, unhurried prose that feels like being told a story
-- You paint pictures with words — the reader feels transported
-- You weave between the book's world and real human emotions seamlessly  
-- You treat the reader as intelligent and curious
-- Your tone is intimate, like a late night conversation by a fireplace
-- You never summarize like a book report — you illuminate like a poet
-- You make the reader FEEL the book, not just understand it
-- No bullet points ever. No markdown symbols. Pure flowing prose only.
-- Write at least 800 words — this should take 8 to 10 minutes to read slowly"""
+- Rich, immersive, flowing prose — never dry or academic
+- For novels: tell the full story with vivid scenes, characters, emotions, and plot
+- For biographies: bring the person to life with their struggles, triumphs, and lessons
+- For philosophy: make ancient or complex ideas feel alive and personally relevant
+- For science: tell the story of the discovery and why it changes how we see the world
+- Write as if you are the most engaging professor who ever lived
+- The reader should feel they truly experienced the whole book
+- No bullet points. No markdown. Pure flowing prose only.
+- Write at least 1500 words — this is a full bedtime reading experience"""
 
-    prompt = f"""Tonight you are sharing: {book_title} by {book_author}
-Category: {book_category}
-Tonight is Day {day_of_week + 1} of 7. Tonight's deep focus: {day_theme}
+    prompt = f"""Tonight's book is: {book_title} by {book_author}
+Genre: {book_category}
+Date: {date_str}
 
-Write a rich, immersive, beautifully crafted bedtime reading experience.
+Write a complete, immersive, full-book experience. Cover the ENTIRE book tonight.
 
-Begin with a warm, poetic opening paragraph that sets the mood and draws the reader 
-into the world of this book. Make them feel they are settling in for something special.
+Start with a compelling opening that sets the mood and tells the reader why this 
+book matters and why it has stood the test of time.
 
-Then spend the heart of the piece going deeply into: {day_theme}
-This is not a summary. This is an experience. Write as if you are slowly walking 
-the reader through the most meaningful rooms of this book, pausing in each one, 
-letting them feel the weight and beauty of the ideas. Use scenes from the book. 
-Use the author's own ideas but expressed in your warm storytelling voice. 
-Connect the book's world to the reader's inner life — their hopes, fears, 
-relationships, choices, and dreams.
+Then take the reader through the COMPLETE journey of the book:
 
-Then write a closing section called "Before You Sleep" — a gentle, reflective 
-passage that leaves the reader with one profound thought to carry into their dreams. 
-Not a question. A thought. Something that lingers like the last note of a song.
+For novels and memoirs: Tell the full story from beginning to end. Introduce every 
+major character vividly. Describe the key scenes with emotion and detail. Do not 
+skip the ending. Make the reader feel every turning point.
 
-End with one sentence: "Tomorrow night we explore: {tomorrow_theme}"
+For philosophy and self-development: Walk through every major idea in the book from 
+start to finish. Use real examples and stories to make each concept come alive. 
+Connect every idea to real modern life.
 
-Write at least 800 words. This is bedtime literature, not a summary.
+For science and history: Tell the full story of the discovery or events. Explain 
+every major concept clearly and beautifully. Share the human stories behind the 
+science or history.
+
+For biographies: Tell the person's full life story. Their childhood, struggles, 
+breakthroughs, failures, greatest moments, and lasting legacy.
+
+End with a section called WHAT THIS BOOK LEAVES YOU WITH — the deepest lesson or 
+feeling the book gives you, and why it stays with you long after the last page.
+
+Write at least 1500 words. This is a complete book experience, not a summary.
 Plain text only. No asterisks, no underscores, no special characters."""
 
     content = ask_claude(prompt, system=system, max_tokens=2048)
 
     message = (
         f"Bedtime Reading - {date_str}\n\n"
-        f"Book: {book_title}\n"
+        f"Tonight's Book: {book_title}\n"
         f"Author: {book_author}\n"
-        f"Night {day_of_week + 1} of 7\n\n"
+        f"Genre: {book_category.title()}\n\n"
         f"{'─' * 30}\n\n"
         f"{content}\n\n"
         f"{'─' * 30}\n"
-        f"Sleep well. The book continues tomorrow."
+        f"Sleep well. A new book waits tomorrow night."
     )
 
     send_message(message)
