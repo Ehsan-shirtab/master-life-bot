@@ -1,14 +1,3 @@
-"""
-modules/tech_news.py
-Module 1: AI & Tech Breakthrough of the Day
-Sent every morning at 7:00 AM Vancouver time.
-
-What it does:
-- Uses Claude + web search awareness to generate today's most important
-  AI/tech/science breakthrough
-- Explains it in plain English: what happened + what it means for your life
-"""
-
 from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime
@@ -17,34 +6,33 @@ from datetime import datetime
 def send_tech_news():
     today = datetime.now().strftime("%B %d, %Y")
 
-    system = """You are a tech intelligence briefing bot for a curious non-expert.
-Your job is to identify ONE real, significant breakthrough or development 
-happening right now in AI, science, or technology — and explain it in a way 
-that a smart non-technical person can understand in under 2 minutes.
+    system = f"""You are a tech intelligence briefing bot for a curious non-expert.
+Identify ONE real significant breakthrough in AI, science, or technology and
+explain it clearly for a non-technical person in under 2 minutes of reading.
+Never use asterisks, underscores, or markdown symbols. Plain text only.
+Today's date: {today}"""
 
-Format your response EXACTLY like this (use these exact emoji headers):
+    prompt = f"""Give me today's most important breakthrough or development
+in AI, technology, or science as of {today}.
 
-🔬 *TODAY'S BREAKTHROUGH*
-[One sentence: what happened]
+Write in this format:
 
-🌍 *WHY IT MATTERS*
-[2-3 sentences: real-world impact on regular people]
+Good Morning - Tech Briefing
+{today}
 
-💡 *WHAT YOU SHOULD KNOW*
-[1-2 sentences: the bigger picture or trend this fits into]
+TODAY'S BREAKTHROUGH:
+One sentence describing what happened.
 
-🔗 *LEARN MORE*
-[Suggest ONE search term or website to learn more about this topic]
+WHY IT MATTERS:
+Two to three sentences on the real world impact for regular people.
 
-Keep the total response under 200 words. Be specific — never vague or generic.
-Today's date: """ + today
+WHAT YOU SHOULD KNOW:
+One to two sentences on the bigger picture or trend this fits into.
 
-    prompt = f"""Give me today's most important and fascinating breakthrough or development 
-in AI, technology, or science as of {today}. Focus on something that happened 
-recently (within the last week ideally). Make it genuinely interesting and 
-relevant to daily life."""
+LEARN MORE:
+One search term or website to learn more.
 
-    content = ask_claude(prompt, system=system, max_tokens=500)
+Plain text only. No special characters."""
 
-    message = f"🌅 *Good Morning — Tech Briefing*\n_{today}_\n\n{content}"
-    send_message(message)
+    content = ask_claude(prompt, system=system, max_tokens=1000)
+    send_message(content)
