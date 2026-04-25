@@ -1,17 +1,3 @@
-"""
-modules/analytics.py
-Module 7: Sunday Life Dashboard
-Sent every Sunday at 8:00 AM Vancouver time.
-
-What it does:
-- Weekly recap of everything the bot delivered that week
-- Highlights the most important ideas from each module
-- Gives you a "weekly intelligence briefing" — what you learned
-- Motivates you for the coming week
-- Since no external storage is used, it generates a smart weekly summary
-  based on what the week's content would have covered
-"""
-
 from utils.ai import ask_claude
 from utils.telegram import send_message
 from datetime import datetime, date, timedelta
@@ -22,88 +8,65 @@ def send_analytics():
     date_str = today.strftime("%B %d, %Y")
     week_num = today.isocalendar()[1]
 
-    # Calculate week range
     week_start = today - timedelta(days=today.weekday() + 1)
-    week_end = today
-    week_range = f"{week_start.strftime('%b %d')} – {week_end.strftime('%b %d, %Y')}"
+    week_range = f"{week_start.strftime('%b %d')} - {week_end.strftime('%b %d, %Y')}"
 
-    # Get what book was covered this week
-    from modules.book_summary import get_this_weeks_book, BOOK_LIST
     from modules.skill_of_week import get_week_skill
-
-    book_title, book_author, _ = get_this_weeks_book()
     skill = get_week_skill()
 
-    # Get next week's book and skill
-    next_week_book = BOOK_LIST[(week_num + 1) % len(BOOK_LIST)]
-    next_skill_categories = [
-        "communication & persuasion", "productivity & time management",
-        "Excel & spreadsheet shortcuts", "Python & coding basics",
-        "financial literacy", "negotiation & influence",
-        "critical thinking & logic", "clear professional writing",
-        "speed reading & comprehension", "memory techniques & mnemonics",
-        "public speaking & confidence", "problem solving frameworks",
-    ]
-    next_skill = next_skill_categories[(week_num + 1) % len(next_skill_categories)]
+    from modules.skill_of_week import SKILL_CATEGORIES
+    next_skill = SKILL_CATEGORIES[(week_num + 1) % len(SKILL_CATEGORIES)]
 
     system = """You are a personal life intelligence assistant creating a Sunday 
-weekly review. Be encouraging, insightful, and forward-looking. 
-Write like a smart friend reviewing your week with you."""
+weekly review. Be encouraging, insightful, and forward-looking.
+Never use asterisks, underscores, or markdown symbols. Plain text only."""
 
-    prompt = f"""Create a Sunday Weekly Life Dashboard for week {week_num} of the year.
+    prompt = f"""Create a Sunday Weekly Life Dashboard for week {week_num}.
 Date: {date_str}
 Week covered: {week_range}
+This week's skill focus: {skill}
 
-This week the user received:
-- Daily AI/Tech breakthroughs (Mon-Sun)
-- Skill of the Week: {skill}
-- Daily Second Brain captures (rotating topics: psychology, future of work, health, economics, philosophy, nature, history)
-- Weekly Trend Radar (Monday)
-- Daily Bedtime Book: "{book_title}" by {book_author}
-- Daily English Immersion (rotating: idioms, phrasal verbs, vocabulary, writing tips, pronunciation, Canadian English, business English)
+This week the user received daily AI and tech briefings, skill lessons on {skill}, 
+daily English immersion lessons, nightly book summaries of classic literature, 
+nightly Second Brain captures, and weekly trend radar.
 
-Next week:
-- Book: "{next_week_book[0]}" by {next_week_book[1]}
-- Skill: {next_skill}
+Format exactly like this:
 
-Format EXACTLY:
+SUNDAY LIFE DASHBOARD
+Week {week_num} - {week_range}
 
-☀️ *SUNDAY LIFE DASHBOARD*
-_Week {week_num} · {week_range}_
+THIS WEEK YOU LEARNED:
 
-━━━━━━━━━━━━━━━
+Tech and AI: One sentence summarizing the kinds of breakthroughs covered this week.
+Skill Focus: Progress through {skill} with Monday introduction, Wednesday practice, Friday real world example.
+Books: A different classic book every night this week.
+Second Brain: Fascinating ideas from psychology, economics, philosophy, science, and history.
+Trend Radar: Three growing trends spotted this week.
+English: Seven daily lessons across idioms, vocabulary, writing, pronunciation, and Canadian expressions.
 
-🧠 *THIS WEEK YOU LEARNED*
+REFLECTION PROMPTS:
+1. One thought provoking question about growth this week.
+2. One question connecting this week's learning to real life decisions.
 
-📡 Tech & AI: [1 sentence summarizing the kind of breakthroughs covered this week]
-💡 Skill: Progressed through *{skill}* — Mon intro, Wed practice, Fri real-world example
-📚 Book: Explored "{book_title}" — [1 sentence on the book's core theme]
-🌍 Second Brain: [Topics like psychology, economics, philosophy — 1 sentence]
-📈 Trend Radar: [1 sentence on the type of trends spotted this week]
-🇨🇦 English: 7 lessons across idioms, vocabulary, writing & Canadian expressions
+NEXT WEEK PREVIEW:
+Skill next week: {next_skill}
+Books: A new classic every night.
+All daily messages continue on their regular schedule.
 
-━━━━━━━━━━━━━━━
+WEEKLY INTENTION:
+One powerful, warm sentence to set a positive intention for the coming week.
 
-💭 *REFLECTION PROMPTS*
-1. [A thought-provoking question about growth this week]
-2. [A question connecting this week's learning to real life]
+Plain text only. No special characters."""
 
-━━━━━━━━━━━━━━━
+    content = ask_claude(prompt, system=system, max_tokens=2048)
 
-🔭 *NEXT WEEK PREVIEW*
-📚 Book: *{next_week_book[0]}* by {next_week_book[1]}
-💡 Skill: {next_skill}
-📡 Tech briefings continue daily at 7 AM
-🌙 Bedtime reading every night at 9 PM
+    message = (
+        f"Sunday Life Dashboard\n"
+        f"Week {week_num} - {date_str}\n\n"
+        f"{'─' * 30}\n\n"
+        f"{content}\n\n"
+        f"{'─' * 30}\n"
+        f"Great week. Keep going."
+    )
 
-━━━━━━━━━━━━━━━
-
-🌱 *WEEKLY INTENTION*
-[One powerful sentence to set a positive intention for the coming week]
-
-_You showed up this week. That's everything. 💪_
-
-Keep it motivating and under 300 words."""
-
-    content = ask_claude(prompt, system=system, max_tokens=700)
-    send_message(content)
+    send_message(message)
