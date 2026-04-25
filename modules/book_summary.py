@@ -4,7 +4,6 @@ from datetime import datetime, date
 
 
 BOOK_LIST = [
-    # Novels & Classics
     ("The Great Gatsby", "F. Scott Fitzgerald", "novel"),
     ("The Alchemist", "Paulo Coelho", "novel"),
     ("The Old Man and the Sea", "Ernest Hemingway", "novel"),
@@ -18,14 +17,11 @@ BOOK_LIST = [
     ("Crime and Punishment", "Fyodor Dostoevsky", "novel"),
     ("The Count of Monte Cristo", "Alexandre Dumas", "novel"),
     ("Les Miserables", "Victor Hugo", "novel"),
-    ("Don Quixote", "Miguel de Cervantes", "novel"),
     ("Anna Karenina", "Leo Tolstoy", "novel"),
     ("The Brothers Karamazov", "Fyodor Dostoevsky", "novel"),
-    ("Moby Dick", "Herman Melville", "novel"),
     ("Jane Eyre", "Charlotte Bronte", "novel"),
     ("Wuthering Heights", "Emily Bronte", "novel"),
     ("The Catcher in the Rye", "J.D. Salinger", "novel"),
-    # Biographies & Memoirs
     ("The Diary of a Young Girl", "Anne Frank", "biography"),
     ("Long Walk to Freedom", "Nelson Mandela", "biography"),
     ("Leonardo da Vinci", "Walter Isaacson", "biography"),
@@ -34,15 +30,12 @@ BOOK_LIST = [
     ("The Glass Castle", "Jeannette Walls", "memoir"),
     ("Born a Crime", "Trevor Noah", "memoir"),
     ("I Know Why the Caged Bird Sings", "Maya Angelou", "memoir"),
-    # Philosophy & Wisdom
     ("Meditations", "Marcus Aurelius", "philosophy"),
     ("The Art of War", "Sun Tzu", "philosophy"),
     ("Man's Search for Meaning", "Viktor Frankl", "philosophy"),
-    # Science & History
     ("A Brief History of Time", "Stephen Hawking", "science"),
     ("Sapiens", "Yuval Noah Harari", "history"),
     ("Cosmos", "Carl Sagan", "science"),
-    # Self Development
     ("Atomic Habits", "James Clear", "self-development"),
     ("Thinking Fast and Slow", "Daniel Kahneman", "self-development"),
     ("The Psychology of Money", "Morgan Housel", "self-development"),
@@ -57,69 +50,46 @@ def get_tonights_book():
 def send_book_summary():
     today = datetime.now()
     date_str = today.strftime("%B %d, %Y")
-
     book_title, book_author, book_category = get_tonights_book()
 
-    system = """You are a master storyteller who retells books in a warm, 
-immersive, story-like way. You write in clear intermediate English so that 
-anyone can enjoy and understand the story deeply.
+    system = """You are a master storyteller who retells books in warm flowing
+prose in intermediate English. You write like you are telling a beloved story
+to a friend before bed. Never use asterisks, underscores, or any markdown.
+Plain text only. Write complete stories with a clear beginning, middle, and end."""
 
-Your writing rules:
-- Write like you are telling a friend the story of a book you love
-- Use simple but beautiful sentences
-- Describe scenes, characters, emotions, and places vividly
-- For novels: tell the complete story from beginning to end, including the ending
-- For biographies: tell the person's full life as a human story
-- For philosophy: explain ideas through stories and real life examples
-- For science and history: tell it as a fascinating human journey of discovery
-- Never use bullet points
-- Never use asterisks, underscores, dashes as decoration, or any markdown
-- Write in flowing paragraphs only
-- Write at least 1500 words so the reader feels they truly read the whole book
-- The tone should feel like sitting by a fireplace listening to a great storyteller"""
-
-    prompt = f"""Tonight's book is: {book_title} by {book_author}
+    prompt = f"""Tonight's book: {book_title} by {book_author}
 Genre: {book_category}
 
-Write a complete, long, story-like retelling of this entire book in intermediate 
-English. The reader should feel like they are actually reading the book itself, 
-not a school summary.
+Write a COMPLETE story-like retelling of this entire book from start to finish.
+The reader must get the whole story in one reading tonight, not continued tomorrow.
 
-Follow this structure:
+Rules:
+- Write in flowing paragraphs, intermediate English
+- Include all major characters, scenes, turning points, and the ending
+- Write exactly like the example below in style and length
+- Minimum 1200 words, maximum 1600 words
+- End with a section starting with: What this book leaves you with
+- Plain text only, no special characters
 
-Start by setting the scene. Where does this story take place? What is the world 
-of this book? Who are the main characters? Introduce everything naturally, the 
-way a story begins.
+Style example: 
+The story takes place in the summer of 1922 in Long Island near New York City. 
+It is told by a young man named Nick Carraway. Nick comes from the Midwest and 
+moves east to work in the bond business. He rents a small house in a wealthy area 
+called West Egg. Right next door stands a huge beautiful mansion owned by a 
+mysterious man named Jay Gatsby...
 
-Then tell the complete story or content of the book from beginning to end. 
-Include all important scenes, characters, turning points, conflicts, and emotions. 
-Do not skip the middle or the ending. Every important moment should be described 
-with enough detail that the reader can picture it clearly and feel it emotionally.
-
-Write each scene as a paragraph or series of paragraphs. Move through the story 
-naturally, the way a good novel flows. Use transitions like "A few days later", 
-"That same evening", "As weeks passed", "On the morning of" to guide the reader 
-through time.
-
-End with a final section that begins with the words: What this book leaves you with.
-In this section, reflect on the deepest message or feeling of the book. What does 
-it say about life, people, love, courage, money, power, or time? Write this as a 
-warm, thoughtful paragraph that stays with the reader as they fall asleep.
-
-Write at least 1500 words. Use clear intermediate English throughout.
-Plain text only. No special characters or formatting symbols."""
+Now write the complete story of {book_title} in this same style."""
 
     content = ask_claude(prompt, system=system, max_tokens=2048)
 
-    message = (
-        f"Bedtime Reading - {date_str}\n\n"
+    header = (
+        f"Bedtime Reading - {date_str}\n"
         f"Tonight: {book_title}\n"
         f"By: {book_author}\n"
-        f"Genre: {book_category.title()}\n\n"
         f"{'─' * 30}\n\n"
-        f"{content}\n\n"
-        f"{'─' * 30}\n\n"
-        f"Sleep well. A new book waits tomorrow night."
     )
 
-    send_message(message)
+    footer = f"\n\n{'─' * 30}\nSleep well. A new book waits tomorrow night."
+
+    full_message = header + content + footer
+    send_message(full_message)
